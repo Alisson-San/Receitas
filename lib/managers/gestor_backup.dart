@@ -46,11 +46,11 @@ class GestorBackup {
   }
 
   
-  Future<void> LocalBackup(BuildContext context) async {
+  Future<void> LocalBackup(BuildContext? context) async {
     // Solicitar permissão de armazenamento
     var status = await Permission.storage.request();
     if (!status.isGranted) {
-      if (context.mounted) {
+      if (context != null && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Permissão de armazenamento negada. Não foi possível realizar o backup local.')),
         );
@@ -74,13 +74,13 @@ class GestorBackup {
         await file.writeAsString(jsonString);
 
         notificacaoServico.mostrarNotificacao('Backup Local Concluído', 'Suas receitas foram salvas em $fileName');
-        if (context.mounted) {
+        if (context != null && context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Backup local salvo em: ${file.path}')),
           );
         }
       } else {
-        if (context.mounted) {
+        if (context != null && context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Seleção de diretório cancelada.')),
           );
@@ -90,7 +90,7 @@ class GestorBackup {
     } on PathAccessException catch (e) {
       debugPrint('Erro de permissão ou acesso ao path (Backup Local): $e');
       notificacaoServico.mostrarNotificacao('Backup Local Falhou', 'Erro de permissão ao salvar o arquivo: ${e.message}. Tente outro local.');
-      if (context.mounted) {
+      if (context != null && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro ao salvar o backup. Tente salvar em outro local. (Detalhes: ${e.message})')),
         );
@@ -98,7 +98,7 @@ class GestorBackup {
     } catch (e) {
       debugPrint('Erro inesperado ao realizar backup local: $e');
       notificacaoServico.mostrarNotificacao('Backup Local Falhou', 'Ocorreu um erro inesperado: $e');
-      if (context.mounted) {
+      if (context != null && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro ao realizar backup local: $e')),
         );
@@ -217,7 +217,7 @@ class GestorBackup {
     }
   }
 
-  Future<void> FirebaseBackup(BuildContext context) async {
+  Future<void> FirebaseBackup(BuildContext? context) async {
     try {
       final List<Receita> todosDadosUsuario = await _pegarTodasInformacaoUsuario();
       final CollectionReference userRecipesCollection =
@@ -252,7 +252,7 @@ class GestorBackup {
         }
       }
       notificacaoServico.mostrarNotificacao('Backup Firebase Concluído', 'Suas receitas foram salvas no Firebase.');
-      if (context.mounted) {
+      if (context != null && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Backup no Firebase concluído com sucesso!')),
         );
@@ -260,7 +260,7 @@ class GestorBackup {
     } catch (e) {
       debugPrint('Erro ao realizar backup Firebase: $e');
       notificacaoServico.mostrarNotificacao('Backup Firebase Falhou', 'Falha ao salvar receitas no Firebase: $e');
-      if (context.mounted) {
+      if (context != null && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro ao realizar backup Firebase: $e')),
         );
@@ -329,7 +329,9 @@ class GestorBackup {
         
         final todosDadosUsuario = await _pegarTodasInformacaoUsuario();
         for (var receita in todosDadosUsuario) {
-          receitaRepository.remover(receita.id!);
+          await receitaRepository.remover(receita.id!);
+          await ingredientesRepository.removerTodosDaReceita(receita.id!);
+          await instrucoesRepository.removerTodosDaReceita(receita.id!);
         }
         // Restaura as receitas do Firebase
         receitasRestauradas.forEach((receita) async{
@@ -337,6 +339,16 @@ class GestorBackup {
 
           await receitaRepository.adicionar(receita);
         });
+        for (var receita in receitasRestauradas) {
+          receita.ingredientes.forEach((ingrediente) async {
+            ingrediente.receitaId = receita.id; 
+            await ingredientesRepository.adicionar(ingrediente);
+          });
+          receita.instrucoes.forEach((instrucao) async {
+            instrucao.receitaId = receita.id; 
+            await instrucoesRepository.adicionar(instrucao);
+          });
+        }
       
 
         notificacaoServico.mostrarNotificacao('Restauração Firebase Concluída', 'Receitas restauradas do Firebase.');

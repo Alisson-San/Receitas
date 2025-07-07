@@ -7,43 +7,40 @@ class ReceitaRepository {
   final DatabaseHelper _db = DatabaseHelper();
 
   Future<void> adicionar(Receita receita) async {
-    final db = await _db.database;
-    await db.insert(
+    await _db.inserir(
       'receitas',
       receita.toSqliteMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
   Future<void> atualizar(Receita receita) async {
-    final db = await _db.database;
-    await db.update(
+    await _db.atualizar(
       'receitas',
       receita.toSqliteMap(),
-      where: 'id = ?',
-      whereArgs: [receita.id],
+      condicao: 'id = ?',
+      conidcaoArgs: [?receita.id],
     );
   }
 
   Future<void> remover(String id) async {
-    final db = await _db.database;
+    
 
-    await db.delete(
+    await _db.deletar(
       'ingredientes',
-      where: 'receitaId = ?',
-      whereArgs: [id],
+      condicao: 'receitaId = ?',
+      conidcaoArgs: [id],
     );
 
-    await db.delete(
+    await _db.deletar(
       'instrucoes',
-      where: 'receitaId = ?',
-      whereArgs: [id],
+      condicao: 'receitaId = ?',
+      conidcaoArgs: [id],
     );
 
-    await db.delete(
+    await _db.deletar(
       'receitas',
-      where: 'id = ?',
-      whereArgs: [id],
+      condicao: 'id = ?',
+      conidcaoArgs: [id],
     );
   }
 

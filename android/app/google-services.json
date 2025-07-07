@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "504217658511",
+    "project_id": "ucsbentoreceita",
+    "storage_bucket": "ucsbentoreceita.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:504217658511:android:ac516396503c2a55eabcfa",
+        "android_client_info": {
+          "package_name": "com.example.receita"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATGBCudAtC8QoPI0CWyqhXiT3203zNTQs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:504217658511:android:7ae86fd1f4fb50b9eabcfa",
+        "android_client_info": {
+          "package_name": "com.example.receitas"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATGBCudAtC8QoPI0CWyqhXiT3203zNTQs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
